@@ -4,22 +4,17 @@ import { Button, Modal, ModalHeader, ModalBody, Label, Col, Row } from 'reactstr
 import { Control, LocalForm, Errors } from 'react-redux-form';
 import { Link } from 'react-router-dom';
 
-function RenderDish({ dish, comments }) {
+function RenderDish({ dish }) {
     if (dish != null) {
         return (
-            <div className="row">
-                <div className="col-12 col-md-5 m-1">
-                    <Card>
-                        <CardImg width="100%" src={dish.image} alt={dish.name}></CardImg>
-                        <CardBody>
-                            <CardTitle>{dish.name}</CardTitle>
-                            <CardText>{dish.description}</CardText>
-                        </CardBody>
-                    </Card>
-                </div>
-                <div className="col-12 col-md-5 m-1">
-                    < RenderComments comments={comments} />
-                </div>
+            <div className="col-12 col-md-5 m-1">
+                <Card>
+                    <CardImg width="100%" src={dish.image} alt={dish.name}></CardImg>
+                    <CardBody>
+                        <CardTitle>{dish.name}</CardTitle>
+                        <CardText>{dish.description}</CardText>
+                    </CardBody>
+                </Card>
             </div>
         );
     } else {
@@ -29,7 +24,7 @@ function RenderDish({ dish, comments }) {
     }
 }
 
-function RenderComments({ comments }) {
+function RenderComments({ comments, addComment, dishId }) {
 
     const comm = comments.map((comment) => {
         //let date = new Date(comment.date);
@@ -43,10 +38,10 @@ function RenderComments({ comments }) {
 
     if (comments != null) {
         return (
-            <div>
+            <div className="col-12 col-md-5 m-1">
                 <h4>Comments</h4>
                 <ul className="list-unstyled">{comm}</ul>
-                <CommentForm />
+                <CommentForm dishId={dishId} addComment={addComment} />
             </div>
         );
     } else {
@@ -73,8 +68,8 @@ class CommentForm extends Component {
     }
 
     handleSubmit(values) {
-        console.log("Current State is: " + JSON.stringify(values));
-        alert("Current State is: " + JSON.stringify(values))
+        this.toggleModal();
+        this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
     }
 
     toggleModal() {
@@ -184,7 +179,14 @@ const DishDetail = (props) => {
                     <hr />
                 </div>
             </div>
-            < RenderDish dish={props.dish} comments={props.comments} />
+
+            <div className="row">
+                < RenderDish dish={props.dish} />
+                < RenderComments comments={props.comments}
+                    addComment={props.addComment}
+                    dishId={props.dish.id} />
+            </div>
+
         </div>
     );
 }
